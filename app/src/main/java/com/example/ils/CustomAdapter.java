@@ -48,7 +48,6 @@ public class CustomAdapter extends RecyclerView.Adapter<CustomAdapter.MyViewHold
     holder.order_number_txt.setText(String.valueOf(order_number.get(position)));
     holder.order_flavor_txt.setText(String.valueOf(order_flavor.get(position)));
     holder.order_size_txt.setText(String.valueOf(order_size.get(position)));
-
   }
 
   @Override

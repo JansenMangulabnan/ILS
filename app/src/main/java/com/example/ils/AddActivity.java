@@ -2,6 +2,8 @@ package com.example.ils;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.Button;
@@ -18,7 +20,7 @@ public class AddActivity extends AppCompatActivity {
   EditText customerName, customerAddress, customerNumber;
   CheckBox buko, cheese, lanka, kasoy, cookies, fruit_salad, ube, macapuno;
   RadioGroup sizes;
-
+  SQLiteDatabase db;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +43,6 @@ public class AddActivity extends AppCompatActivity {
     sizes = findViewById(R.id.r_sizes);
     Button finishButton = findViewById(R.id.finish);
 
-    SQLiteDatabase db;
-
-    db = openOrCreateDatabase("OrderList", Context.MODE_PRIVATE, null);
-    db.execSQL("CREATE TABLE IF NOT EXISTS orders(name TEXT, address TEXT, number TEXT, flavor TEXT, size TEXT)");
-
     finishButton.setOnClickListener(v -> {
       String name = customerName.getText().toString().trim();
       String address = customerAddress.getText().toString().trim();
@@ -64,9 +61,9 @@ public class AddActivity extends AppCompatActivity {
       } else if (number.isEmpty()) {
         msg("No", "Enter a Number");
       } else {
-
+        db = openOrCreateDatabase("orders.db", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS orders(name TEXT, address TEXT, number TEXT, flavor TEXT, size TEXT);");
         db.execSQL("INSERT INTO orders VALUES('" + name + "', '" + address + "', '" + number + "', '" + flavor + "', '" + size + "');");
-        Toast.makeText(this, name, Toast.LENGTH_SHORT).show();
         msg("done");
       }
     });
@@ -96,10 +93,14 @@ public class AddActivity extends AppCompatActivity {
       selectedFlavors.append("Ube, ");
     }
     if (macapuno.isChecked()) {
-      selectedFlavors.append("Macapuno ");
+      selectedFlavors.append("Macapuno, ");
+    }
+    if (selectedFlavors.length() > 0) {
+      selectedFlavors.setLength(selectedFlavors.length() - 2);
     }
     return selectedFlavors.toString();
   }
+
   String getSelectedSize() {
     String selectedSize = "";
 
@@ -115,6 +116,11 @@ public class AddActivity extends AppCompatActivity {
     new AlertDialog.Builder(this ).setTitle(title).setMessage(context).setPositiveButton("OK", null).show();
   }
   void msg(String title) {
-    new AlertDialog.Builder(this ).setTitle(title).setPositiveButton("OK", null).show();
+    new AlertDialog.Builder(this ).setTitle(title).setPositiveButton("OK", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        finish();
+      }
+    }).show();
   }
 }
